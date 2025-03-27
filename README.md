@@ -21,3 +21,5 @@ Namun, dalam contoh yang kamu tampilkan, nilai **size** adalah **260**, yang sed
 3. Pengolahan sinyal tambahan yang dilakukan oleh perangkat sebelum disimpan.
 
 untuk memverifikasi jumlah sampel dalam kolom `data` sesuai dengan nilai `size` jalankan file `validation.py`
+
+![image](https://github.com/user-attachments/assets/46438b9c-e5a6-425e-8b06-f41e22d2ae11)
