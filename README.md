@@ -8,6 +8,8 @@ Braindecoding on MNIST Stimuli with EEG as input signal
 
 Untuk event yang sama untuk stimulus yang sama dari berbeda elektroda 
 
+Stimulus ada pada label atribut code
+
 Envireontment:
 1. Python 3.13.3
 
