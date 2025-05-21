@@ -10,8 +10,15 @@ Untuk event yang sama untuk stimulus yang sama dari berbeda elektroda
 
 Stimulus ada pada label atribut code
 
-Envireontment:
+Environment:
 1. Python 3.13.3
+
+Run:
+1. main.py convert txt to parquet
+2. normalize.py to normalize eeg signal
+3. combine.py to combine all channel to one atribut 
+latest field: event,eeg_vector,code
+
 
 ## Validasi dataset
 
