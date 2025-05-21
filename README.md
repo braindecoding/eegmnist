@@ -83,3 +83,8 @@ Ya, **feature extraction sangat penting** dalam *brain decoding* karena sinyal E
 
 
 
+## Inovasi
+
+Model:
+1. Generative Adversarial Network
+2. Diffusion Model
