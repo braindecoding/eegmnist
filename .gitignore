@@ -1,6 +1,6 @@
 # Ignore dataset
 EP1.01.txt
-
+*.parquet
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
