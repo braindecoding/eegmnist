@@ -5,6 +5,9 @@ Braindecoding on MNIST Stimuli with EEG as input signal
 3. Link for [dataset](https://mindbigdata.com/opendb/MindBigData-EP-v1.0.zip)
 
 
+Envireontment:
+1. Python 3.13.3
+
 ## Validasi dataset
 
 ![image](https://github.com/user-attachments/assets/fde68e6e-4001-4321-b7c2-b9f8f022cc63)
