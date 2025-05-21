@@ -3,3 +3,8 @@ scipy
 scikit-learn
 pyarrow
 fastparquet
+scikit-image
+numpy
+matplotlib
+tensorflow_addons
+pytorch-fid

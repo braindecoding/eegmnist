@@ -11,7 +11,7 @@ Untuk event yang sama untuk stimulus yang sama dari berbeda elektroda
 Stimulus ada pada label atribut code
 
 Environment:
-1. Python 3.13.3
+1. Python 3.11
 
 Run:
 1. main.py convert txt to parquet
