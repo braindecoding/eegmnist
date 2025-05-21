@@ -4,6 +4,7 @@ Braindecoding on MNIST Stimuli with EEG as input signal
 2. Focusing in [Emotiv EPOC device](https://www.emotiv.com/products/epoc-x)
 3. Link for [dataset](https://mindbigdata.com/opendb/MindBigData-EP-v1.0.zip)
 
+![image](https://github.com/user-attachments/assets/e1a0ab75-b257-4323-bb67-3419098a79b8)
 
 Envireontment:
 1. Python 3.13.3
