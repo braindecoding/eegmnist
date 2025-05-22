@@ -173,11 +173,11 @@ sigma_r,sigma_h = init.matriksidentitasukuran(C)
 tau_mu,eta_mu,gamma_mu=init.alphabagibeta(tau_alpha,tau_beta,eta_alpha,eta_beta,gamma_alpha,gamma_beta)
 Y_lsgms = np.log(1 / gamma_mu * np.ones((numTrn, D2))).astype(np.float32)
 
-#S=np.mat(calculate.S(k, t, Y_train, Y_test))
+#S=np.asmatrix(calculate.S(k, t, Y_train, Y_test))
 
 from lib import siamese,calculate
-#S=np.mat(siamese.S(k, t, Y_train, Y_validation))
-S=np.mat(calculate.S(k, t, Y_train, Y_validation))
+#S=np.asmatrix(siamese.S(k, t, Y_train, Y_validation))
+S=np.asmatrix(calculate.S(k, t, Y_train, Y_validation))
 # In[]: Loop training
 
 for l in range(maxiter):
@@ -206,11 +206,11 @@ for l in range(maxiter):
 print("reconstruct X (image) from Y (fmri)")
 X_reconstructed_mu = np.zeros((numTest, img_chns, img_rows, img_cols))#empty array
 HHT = H_mu * H_mu.T + D2 * sigma_h
-Temp = gamma_mu * np.mat(np.eye(D2)) - (gamma_mu**2) * (H_mu.T * (np.mat(np.eye(C)) + gamma_mu * HHT).I * H_mu)
+Temp = gamma_mu * np.asmatrix(np.eye(D2)) - (gamma_mu**2) * (H_mu.T * (np.asmatrix(np.eye(C)) + gamma_mu * HHT).I * H_mu)
 for i in range(numTest):
     s=S[:,i]
-    z_sigma_test = (B_mu * Temp * B_mu.T + (1 + rho * s.sum(axis=0)[0,0]) * np.mat(np.eye(K)) ).I#mencari variansi / kuadrat standar deviasi
-    z_mu_test = (z_sigma_test * (B_mu * Temp * (np.mat(Y_test)[i,:]).T + rho * np.mat(Z_mu).T * s )).T#mencari nilai untuk inputan terbaik, biasanya dari rata2
+    z_sigma_test = (B_mu * Temp * B_mu.T + (1 + rho * s.sum(axis=0)[0,0]) * np.asmatrix(np.eye(K)) ).I#mencari variansi / kuadrat standar deviasi
+    z_mu_test = (z_sigma_test * (B_mu * Temp * (np.asmatrix(Y_test)[i,:]).T + rho * np.asmatrix(Z_mu).T * s )).T#mencari nilai untuk inputan terbaik, biasanya dari rata2
     temp_mu = np.zeros((1,img_chns, img_rows, img_cols))#1,1,28,28
     epsilon_std = 1
     for l in range(L):#Looping untuk Monte Carlo Sampling
