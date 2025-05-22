@@ -63,23 +63,20 @@ def getXYVal(filepath, resolution, validation_size=0.2, random_state=None):
     return X_train, X_test, X_validation, Y_train, Y_test, Y_validation
 
 def getXYValeeg(filename, resolution=28, test_size=0.2, val_size=0.1, random_state=42):
-    # Load MNIST dari sklearn (fetch_openml)
+    # Load MNIST dari sklearn
     mnist = fetch_openml('mnist_784', version=1)
     X_mnist = mnist.data.values.reshape(-1, 28, 28).astype(np.uint8)
     y_mnist = mnist.target.astype(int).values
 
-    # Load data
+    # Load data EEG
     df = pd.read_parquet(filename)
-
-    # Pastikan eeg_vector jadi numpy array
     df["eeg_vector"] = df["eeg_vector"].apply(np.array)
 
-    # Siapkan dictionary label -> list gambar MNIST sesuai label
+    # Buat dictionary code → gambar MNIST
     mnist_dict = {}
     for digit in range(10):
         mnist_dict[digit] = X_mnist[y_mnist == digit]
 
-    # Fungsi ubah code ke gambar MNIST (ambil gambar pertama dari mnist_dict[label])
     def code_to_image(code):
         imgs = mnist_dict.get(code)
         if imgs is None or len(imgs) == 0:
@@ -90,29 +87,34 @@ def getXYValeeg(filename, resolution=28, test_size=0.2, val_size=0.1, random_sta
         img = img.astype(np.float32) / 255.0
         return img
 
-    # Buat kolom gambar X dari code
     df["X_img"] = df["code"].apply(code_to_image)
 
-    # X: gambar, Y: eeg_vector
-    X = np.stack(df["X_img"].values)  # shape (n_samples, res, res)
-    Y = np.stack(df["eeg_vector"].values)  # shape (n_samples, fixed_length)
+    X = np.stack(df["X_img"].values)
+    Y = np.stack(df["eeg_vector"].values)
+    labels = df["code"].values
 
-    # Split train + temp_test
-    X_train, X_temp, Y_train, Y_temp = train_test_split(
-        X, Y, test_size=(test_size + val_size), random_state=random_state, stratify=df["code"]
+    # Split Train dan Temp (val+test)
+    X_train, X_temp, Y_train, Y_temp, label_train, label_temp = train_test_split(
+        X, Y, labels,
+        test_size=(test_size + val_size),
+        random_state=random_state,
+        stratify=labels
     )
 
-    # Hitung proporsi val dari X_temp
+    # Hitung rasio val dari total temp
     val_ratio = val_size / (test_size + val_size)
 
-    # Split test dan val dari X_temp
+    # Split Temp jadi Validation dan Test
     X_val, X_test, Y_val, Y_test = train_test_split(
-        X_temp, Y_temp, test_size=val_ratio, random_state=random_state, stratify=df.loc[df.index.isin(df.index.difference(X_train.shape[0])), "code"] if len(df) > 0 else None
+        X_temp, Y_temp,
+        test_size=val_ratio,
+        random_state=random_state,
+        stratify=label_temp
     )
 
-    # Reshape channel terakhir untuk CNN (grayscale)
-    X_train = X_train.reshape([X_train.shape[0], resolution, resolution, 1])
-    X_test = X_test.reshape([X_test.shape[0], resolution, resolution, 1])
-    X_val = X_val.reshape([X_val.shape[0], resolution, resolution, 1])
+    # Reshape agar sesuai CNN input (channel di belakang)
+    X_train = X_train.reshape([-1, resolution, resolution, 1])
+    X_test = X_test.reshape([-1, resolution, resolution, 1])
+    X_val = X_val.reshape([-1, resolution, resolution, 1])
 
     return X_train, X_test, X_val, Y_train, Y_test, Y_val

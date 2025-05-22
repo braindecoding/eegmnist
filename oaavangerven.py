@@ -113,19 +113,32 @@ decoder_hid,decoder_upsample,decoder_reshape,decoder_deconv_1,decoder_deconv_2,d
 X_mu,X_lsgms=ars.decoders(Z, decoder_hid,decoder_upsample,decoder_reshape,decoder_deconv_1,decoder_deconv_2,decoder_deconv_3_upsamp,decoder_mean_squash_mu,decoder_mean_squash_lsgms)
 
 # In[]:define custom loss objective function   
-def custom_loss(X, X_mu):#stimulus asli dan hasil pembangkitan
-    X = backend.flatten(X)
-    X_mu = backend.flatten(X_mu) 
-    Lp = 0.5 * backend.mean( 1 + Z_lsgms - backend.square(Z_mu) - backend.exp(Z_lsgms), axis=-1)     
-    Lx =  - metrics.binary_crossentropy(X, X_mu) # Pixels have a Bernoulli distribution  
-    Ly =  obj.Y_normal_logpdf(Y, Y_mu, Y_lsgms,backend) # Voxels have a Gaussian distribution
-    lower_bound = backend.mean(Lp + 10000 * Lx + Ly)
-    cost = - lower_bound
-    return  cost 
+# def custom_loss(X, X_mu):#stimulus asli dan hasil pembangkitan
+#     X = backend.flatten(X)
+#     X_mu = backend.flatten(X_mu) 
+#     Lp = 0.5 * backend.mean( 1 + Z_lsgms - backend.square(Z_mu) - backend.exp(Z_lsgms), axis=-1)     
+#     Lx =  - metrics.binary_crossentropy(X, X_mu) # Pixels have a Bernoulli distribution  
+#     Ly =  obj.Y_normal_logpdf(Y, Y_mu, Y_lsgms,backend) # Voxels have a Gaussian distribution
+#     lower_bound = backend.mean(Lp + 10000 * Lx + Ly)
+#     cost = - lower_bound
+#     return  cost 
+
+def make_custom_loss(Y, Y_mu, Y_lsgms):
+    def custom_loss(X, X_mu):  # X adalah input asli, X_mu adalah hasil rekonstruksi
+        X = backend.flatten(X)
+        X_mu = backend.flatten(X_mu)
+        Lp = 0.5 * backend.mean(1 + Z_lsgms - backend.square(Z_mu) - backend.exp(Z_lsgms), axis=-1)
+        Lx = -metrics.binary_crossentropy(X, X_mu)
+        Ly = obj.Y_normal_logpdf(Y, Y_mu, Y_lsgms, backend)
+        lower_bound = backend.mean(Lp + 10000 * Lx + Ly)
+        return -lower_bound
+    return custom_loss
 
 
 #Jika Y, Y_mu, dan Y_lsgms hanya digunakan dalam perhitungan kerugian dan tidak berkontribusi langsung pada perhitungan output dari model, mereka mungkin berfungsi sebagai "label" tambahan yang membantu model belajar representasi yang lebih baik dari data dengan memberikan lebih banyak informasi tentang bagaimana kerugian harus dihitung.
-DGMM = Model(inputs=[X, Y, Y_mu, Y_lsgms], outputs=X_mu)
+#DGMM = Model(inputs=[X, Y, Y_mu, Y_lsgms], outputs=X_mu)
+DGMM = Model(inputs=X, outputs=X_mu)
+
 
 try:
     opt_method = optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
@@ -133,7 +146,9 @@ except:
     opt_method = optimizers.legacy.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     
 
-DGMM.compile(optimizer = opt_method, loss = custom_loss)
+#DGMM.compile(optimizer = opt_method, loss = custom_loss)
+DGMM.compile(optimizer=opt_method, loss=make_custom_loss(Y, Y_mu, Y_lsgms))
+
 DGMM.summary()
 
 # build a model to project inputs on the latent space

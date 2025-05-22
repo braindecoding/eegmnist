@@ -4,13 +4,15 @@ from tensorflow.keras import backend
 
 # In[]: Building the architechture
 
-def sampling(args):
+def sampling(args,K):
     #is a function that applies the reparametrization trick, 
     #a technique that allows us to backpropagate gradients through the stochastic latent variable.
     #The Lambda layer is used to apply this function to the inputs.
-    Z_mu, Z_lsgms, K = args
+    #Z_mu, Z_lsgms, K = args
+    #epsilon = backend.random_normal(shape=(backend.shape(Z_mu)[0], K), mean=0., stddev=1.0)
+    #return Z_mu + backend.exp(Z_lsgms) * epsilon
+    Z_mu, Z_lsgms = args
     epsilon = backend.random_normal(shape=(backend.shape(Z_mu)[0], K), mean=0., stddev=1.0)
-    
     return Z_mu + backend.exp(Z_lsgms) * epsilon
     
 def encoder(X,D2,img_chns,filters,num_conv,intermediate_dim,K):
@@ -36,7 +38,8 @@ def encoder(X,D2,img_chns,filters,num_conv,intermediate_dim,K):
     Z_lsgms = Dense(K, name='en_var')(hidden)
     # fungsi lambda berguna untuk pura2 menambah layer dengan hanya operasi perhitungan saja 
     # Sebagai contoh sederhana, misalkan Anda memiliki tensor masukan dan Anda ingin mengkuadratkannya.
-    Z = Lambda(sampling, output_shape=(K,))([Z_mu, Z_lsgms,K])
+    # Z = Lambda(sampling, output_shape=(K,))([Z_mu, Z_lsgms,K])
+    Z = Lambda(sampling, output_shape=(K,), arguments={'K': K})([Z_mu, Z_lsgms])
     return Z,Z_lsgms,Z_mu
 
 def decoderars(intermediate_dim,filters,batch_size,num_conv,img_chns):
