@@ -175,9 +175,9 @@ Y_lsgms = np.log(1 / gamma_mu * np.ones((numTrn, D2))).astype(np.float32)
 
 #S=np.asmatrix(calculate.S(k, t, Y_train, Y_test))
 
-from lib import siamese,calculate
+from lib import calcgpu
 #S=np.asmatrix(siamese.S(k, t, Y_train, Y_validation))
-S=np.asmatrix(calculate.S(k, t, Y_train, Y_validation))
+S=np.asmatrix(calcgpu.S_gpu(k, t, Y_train, Y_validation))
 # In[]: Loop training
 
 for l in range(maxiter):
